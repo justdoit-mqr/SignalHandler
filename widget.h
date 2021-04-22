@@ -14,7 +14,7 @@ public:
     ~Widget();
 
 public slots:
-    void udiskSlot(UDiskState state);
+    void udiskStateSlot(int udiskState);
 
 private:
     QPushButton *btn;

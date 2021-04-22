@@ -17,10 +17,9 @@
 #define SIGNALHANDLER_H
 
 #include "signal.h"
-#include "main.h"
 #include <QObject>
 #include <QTimer>
-#include <QMap>
+#include <QQueue>
 
 class SignalHandler : public QObject
 {
@@ -29,6 +28,13 @@ public:
     //自定义Linux(SIGRTMIN--SIGRTMAX)信号值的功能，最好取SIGRTMIN+3之后的值，前几个好像被内部使用了
     enum SignalNum{
         UDISK_SIG=38,//用信号值38标记为U盘信号
+    };
+    //U盘连接状态
+    enum UDiskState
+    {
+        UDISK_CONNECT=0,//连接
+        UDISK_DISCONNECT =1, //断开
+        UDISK_UNKNOW=2//未知状态
     };
 
     //单例模式
@@ -39,17 +45,21 @@ public:
     }
     //信号安装注册
     void registerSignal(int sigNum, bool isSigIGN=false);
+
+private:
+    //私有构造函数
+    SignalHandler();
     //必须是静态成员函数，否则信号安装时会因为隐含的this指针造成参数不匹配，无法编译通过。
     static void signalHandle(int sig,siginfo_t *s_t,void *p);
 
-private:
-    SignalHandler();//私有构造函数
-    static QTimer delayTimer;//延后处理定时器
-    static QMap<int,int> sigNumAndValue;//保存信号值和携带的参数值
-    static int currentSigNum;//当前要处理的信号值
+    //延后处理定时器
+    static QTimer delayTimer;
+    //按队列保存接收到的信号值和携带的参数值(两个队列长度保持一致，一一对应)
+    static QQueue<int> sigNumQueue;
+    static QQueue<int> sigValQueue;
 
 signals:
-    void udiskSignal(UDiskState state);
+    void udiskStateSignal(int udiskState);
 
 public slots:
     void delayTimerSlot();//延后处理

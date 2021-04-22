@@ -17,7 +17,6 @@ SOURCES += main.cpp\
     signalhandler.cpp
 
 HEADERS  += widget.h \
-    signalhandler.h \
-    main.h
+    signalhandler.h
 
 FORMS    +=
